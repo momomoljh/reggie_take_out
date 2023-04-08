@@ -4,6 +4,11 @@ spring:
   application:
     #应用的名称，可选
     name: reggie_take_out
+  redis:
+    host: 124.222.161.233
+    port: 6379
+    password: 20040813,ljh.
+    database: 0
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
