@@ -8,6 +8,7 @@ import org.example.reggie.common.R;
 import org.example.reggie.entity.User;
 import org.example.reggie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RequestMapping("/user")
 @Slf4j
@@ -27,6 +29,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
   /*  @PostMapping("/sendMsg")
     public R<String> sengMsg(@RequestBody User user, HttpSession session) {
@@ -55,7 +59,8 @@ public class UserController {
           message.setSubject("验证码");
           message.setText("123456");
           String code = message.getText();
-          session.setAttribute(phone, code);
+          //session.setAttribute(phone, code);
+          redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
           javaMailSender.send(message);
           log.info("发送成功");
           return R.success("验证码发送成功");
@@ -72,7 +77,6 @@ public class UserController {
 
         //从Session中获取验证码
         Object codeInSession = session.getAttribute(phone);
-
         //验证码比对
         if (codeInSession != null && codeInSession.equals(code)) {
             //登录成功
